@@ -111,35 +111,78 @@ public class MainController {
         return true;
     }
     
-    public void specifyToQuery(String name, String lname, String mobilenumber){        
-        if (name.isEmpty() && lname.isEmpty() && mobilenumber.isEmpty()) 
-            return;
+    public Object[][] specifyToQuery(String name, String lname, String mobilenumber){        
+        /*if (name.isEmpty() && lname.isEmpty() && mobilenumber.isEmpty()) 
+            return null;*/
         
-        int kindOfQuery;
-        if (name.isEmpty())
-            if (lname.isEmpty())
+        int kindOfQuery = 0;
+        if (name.isEmpty()){
+            if (lname.isEmpty()){
                 if (!mobilenumber.isEmpty()) 
                     kindOfQuery = 3; // only mobilenumber
-            else
+            }
+            else{
                 if (!mobilenumber.isEmpty())
                     kindOfQuery = 6; // lname and mobilenumber
                 else
                     kindOfQuery = 2; // only lname
-        else
-            if (lname.isEmpty())
+            }
+        }
+        else{
+            if (lname.isEmpty()){
                 if (!mobilenumber.isEmpty()) 
                     kindOfQuery = 5; // name and mobilenumber
                 else
                     kindOfQuery = 7; // only name
-            else
+            }
+            else{
                 if (!mobilenumber.isEmpty())
                     kindOfQuery = 1; // all of them
                 else
                     kindOfQuery = 4; // name and lname
+            }
+        }
+        
+        return findCustomer(name, lname, mobilenumber, kindOfQuery);
     }
     
-    public void findCustomer(String name, String lname, String mobilenumber){
+    public Object[][] findCustomer(String name, String lname, String mobilenumber, int kind){
+        if (emf == null) return null;
         
+        EntityManager em = emf.createEntityManager();
+        EntityTransaction et = em.getTransaction();
+        Query query = null;
+        
+        switch(kind){
+            case 1: 
+                    query = em.createNamedQuery("query_kind_1").setParameter("_name", name).setParameter("l_name", lname)
+                                                                      .setParameter("m_number", mobilenumber);
+                    break;
+            case 2: 
+                    query = em.createNamedQuery("query_kind_2").setParameter("l_name", lname);
+                    break;                                                   
+            case 3: 
+                    query = em.createNamedQuery("query_kind_3").setParameter("m_number", mobilenumber);
+                    break;                                                   
+            case 4: 
+                    query = em.createNamedQuery("query_kind_4").setParameter("_name", name).setParameter("l_name", lname);
+                    break;                                                   
+            case 5: 
+                    query = em.createNamedQuery("query_kind_5").setParameter("_name", name).setParameter("m_number", mobilenumber);
+                    break;                                                   
+            case 6: 
+                    query = em.createNamedQuery("query_kind_6").setParameter("l_name", lname).setParameter("m_number", mobilenumber);
+                    break;                                                   
+            case 7: 
+                    query = em.createNamedQuery("query_kind_7").setParameter("_name", name);
+                    break;  
+            default:
+                    query = em.createNamedQuery("tumMusteriKayitlari");
+                    break;
+        }
+        
+        List<?> customerList = query.getResultList();
+        return convertListToArray(customerList);
     }
     
     public Object[][] listAllCustomer(){
@@ -151,17 +194,17 @@ public class MainController {
         Query query = em.createNamedQuery("tumMusteriKayitlari");
         List<?> liste = query.getResultList();
 
-        return cleanListe(liste);
+        return convertListToArray(liste);
     }
+    
+    public Object[][] convertListToArray(List<?> list){
+        if (list == null) return null;
 
-    private Object[][] cleanListe(List<?> liste) {
-        if (liste == null) return null;
-        
-        Object data[][] = new Object[liste.size()][7];
-        int index = 0;
+        Object data[][] = new Object[list.size()][7];
         Customer c;
+        int index = 0;
         try{
-            for(Object cus : liste){
+            for(Object cus : list){
                 c = (Customer) cus;
                 data[index][0] = c.getFirstname();
                 data[index][1] = c.getLlstname();

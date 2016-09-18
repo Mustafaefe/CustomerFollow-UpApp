@@ -2,10 +2,12 @@ package View;
 
 import Controller.MainController;
 import Util.MyTableButtonRenderer;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -22,7 +24,7 @@ public class ListOfCustomerPage extends javax.swing.JFrame {
     MyTableModel tableModel;
     
     private void init(){
-        this.setBounds(600, 250, 1000, 750);
+        this.setBounds(450, 200, 1000, 750);
         this.setResizable(false);
         jTable1.setModel(tableModel);
         TableCellRenderer buttonRenderer = new MyTableButtonRenderer();
@@ -70,6 +72,10 @@ public class ListOfCustomerPage extends javax.swing.JFrame {
                                                     Double.class,String.class,Double.class,JButton.class};
         public void setData(Object[][] d){
             this.data = d;
+        }
+        
+        public Object[][] getData(){
+            return data;
         }
         
         public void setdataList(List liste){
@@ -137,6 +143,31 @@ public class ListOfCustomerPage extends javax.swing.JFrame {
         }
     }
     
+    private void findSpecialCustomer() {
+        Object[][] allOfData = tableModel.getData();
+        List<Object[]> newData = new ArrayList();
+        
+        String musteriAdi = jTextField1.getText();
+        String musteriSoyadi = jTextField2.getText();
+        String musteriTel = jTextField3.getText();
+        
+        if (allOfData != null){
+            for(Object[] obj : allOfData){
+                if (obj[0].toString().equals(musteriAdi) || obj[1].toString().equals(musteriSoyadi) 
+                        || obj[2].toString().equals(musteriTel)){
+                    newData.add(obj);
+                }
+            }
+        }
+        Object[][] data = new Object[newData.size()][];
+        for(int i=0; i<newData.size(); i++){
+            data[i] = newData.get(i);
+        }
+        
+        tableModel.setData(data);
+        tableModel.fireTableDataChanged();
+    }
+    
     private void goToMainPage() {
         MainPage mp = new MainPage();
         mp.setVisible(true);
@@ -152,7 +183,8 @@ public class ListOfCustomerPage extends javax.swing.JFrame {
     }
     
     private void goToController(String musteriAdi, String musteriSoyadi, String musteriTel) {
-        mCont.specifyToQuery(musteriTel, musteriTel, musteriTel);
+        tableModel.setData(mCont.specifyToQuery(musteriAdi, musteriSoyadi, musteriTel));
+        tableModel.fireTableDataChanged();
     }
     
     @SuppressWarnings("unchecked")
@@ -161,7 +193,6 @@ public class ListOfCustomerPage extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
@@ -174,6 +205,7 @@ public class ListOfCustomerPage extends javax.swing.JFrame {
         jSeparator2 = new javax.swing.JSeparator();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -181,18 +213,6 @@ public class ListOfCustomerPage extends javax.swing.JFrame {
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/customer-list.png"))); // NOI18N
         jLabel1.setText("Müşteri Listesi");
         jLabel1.setIconTextGap(20);
-
-        jButton1.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/back_arrow.png"))); // NOI18N
-        jButton1.setText("  Ana Sayfa");
-        jButton1.setMaximumSize(new java.awt.Dimension(167, 57));
-        jButton1.setMinimumSize(new java.awt.Dimension(167, 57));
-        jButton1.setPreferredSize(new java.awt.Dimension(167, 57));
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
 
         jLabel4.setFont(new java.awt.Font("Times New Roman", 0, 18)); // NOI18N
         jLabel4.setText("Müşteri Bilgileri");
@@ -259,14 +279,11 @@ public class ListOfCustomerPage extends javax.swing.JFrame {
                         .addGap(0, 11, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
                                 .addComponent(jLabel4)
                                 .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jSeparator2))
                         .addContainerGap())))
@@ -275,10 +292,8 @@ public class ListOfCustomerPage extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(16, 16, 16)
+                .addComponent(jLabel1)
+                .addGap(22, 22, 22)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jLabel4)
@@ -298,31 +313,48 @@ public class ListOfCustomerPage extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        jButton1.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/back_arrow.png"))); // NOI18N
+        jButton1.setText("  Ana Sayfa");
+        jButton1.setMaximumSize(new java.awt.Dimension(167, 57));
+        jButton1.setMinimumSize(new java.awt.Dimension(167, 57));
+        jButton1.setPreferredSize(new java.awt.Dimension(167, 57));
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(68, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        getInfoForFind(); 
+        //findSpecialCustomer();
+    }//GEN-LAST:event_jButton2ActionPerformed
+
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         goToMainPage();
     }//GEN-LAST:event_jButton1ActionPerformed
-
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        getInfoForFind();
-        Object[][] d = new Object[][]{{"Zeynep","EFE","","",111,"",1},{"Zeynep","EFE","","",111,"",1},};
-        tableModel.setData(d);
-        jTable1.setModel(tableModel);
-        ((AbstractTableModel)jTable1.getModel()).fireTableDataChanged();
-    }//GEN-LAST:event_jButton2ActionPerformed
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */

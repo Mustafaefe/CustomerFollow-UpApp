@@ -31,7 +31,7 @@ public class NewCustomerPage extends javax.swing.JFrame {
     MainController mCont;
     
     public void init(){
-        this.setBounds(600, 250, 800, 550);
+        this.setBounds(450, 200, 800, 550);
         this.setResizable(false);
         setDatePicker();
         changeWindowIcon();

@@ -11,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 
@@ -19,7 +20,16 @@ import javax.persistence.OneToOne;
  * @author Mustafa
  */
 @Entity (name = "Musteri")
-@NamedQuery(name = "tumMusteriKayitlari", query = "SELECT customer FROM Musteri customer")
+@NamedQueries({
+    @NamedQuery(name = "tumMusteriKayitlari", query = "SELECT c FROM Musteri c"),
+    @NamedQuery(name = "query_kind_1", query = "SELECT c FROM Musteri c Where c.firstName= :_name and c.lastName= :l_name and c.mobileNumber = :m_number"),
+    @NamedQuery(name = "query_kind_2", query = "SELECT c FROM Musteri c Where c.lastName= :l_name"),
+    @NamedQuery(name = "query_kind_3", query = "SELECT c FROM Musteri c Where c.mobileNumber= :m_number"),
+    @NamedQuery(name = "query_kind_4", query = "SELECT c FROM Musteri c Where c.firstName= :_name and c.lastName= :l_name"),
+    @NamedQuery(name = "query_kind_5", query = "SELECT c FROM Musteri c Where c.firstName= :_name and c.mobileNumber= :m_number"),
+    @NamedQuery(name = "query_kind_6", query = "SELECT c FROM Musteri c Where c.lastName= :l_name and c.mobileNumber= :m_number"),
+    @NamedQuery(name = "query_kind_7", query = "SELECT c FROM Musteri c Where c.firstName= :_name"),
+})
 public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

@@ -17,7 +17,7 @@ public class MainPage extends javax.swing.JFrame {
     EntityManagerFactory emf;
     
     public void init(){
-        this.setBounds(600, 250, 800, 550);
+        this.setBounds(450, 200, 800, 550);
         this.setResizable(false);
         this.setTitle("EFE TİCARET MÜŞTERİ TAKİP SİSTEMİ");
         this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("window_icon.png")));
