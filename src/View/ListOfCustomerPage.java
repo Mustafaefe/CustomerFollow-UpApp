@@ -1,8 +1,11 @@
 package View;
 
 import Controller.MainController;
+import Model.Customer;
 import Util.MyTableButtonRenderer;
+import Util.MyTableModel;
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -26,6 +29,8 @@ public class ListOfCustomerPage extends javax.swing.JFrame {
     private void init(){
         this.setBounds(450, 200, 1000, 750);
         this.setResizable(false);
+        changeWindowIcon();
+        
         jTable1.setModel(tableModel);
         TableCellRenderer buttonRenderer = new MyTableButtonRenderer();
         jTable1.getColumn("Detay").setCellRenderer(buttonRenderer);
@@ -43,6 +48,11 @@ public class ListOfCustomerPage extends javax.swing.JFrame {
         jTable1.setRowHeight(25);
     }
     
+    public void changeWindowIcon(){
+        this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("window_icon.png")));
+        this.setTitle("Müşteri Liste Sayfası");
+    }
+    
     public ListOfCustomerPage() {
         initComponents();
         tableModel = new MyTableModel();
@@ -52,76 +62,7 @@ public class ListOfCustomerPage extends javax.swing.JFrame {
         tableModel.fireTableDataChanged();
     }
     
-    public class MyTableModel extends AbstractTableModel{
-        private String[] COLUMN_NAMES = {"Ad", "Soyad", "Telefon", "Adres","Toplam Borç","Ödeme Sayısı","Kalan Borç","Detay"};
-        private Object[][] data = { {"Mustafa","EFE","","",330,"",4},
-                                    {"İbrahim","EFE","","",555,"",3},
-                                    {"Ramazan","EFE","","",222,"",2},
-                                    {"Zeynep","EFE","","",111,"",1},
-                                    {"Hüsnü","ERCANKAYA","","",111,"",1},
-                                    {"Cengiz","ERCANKAYA","","",111,"",1},
-                                    {"Zehal","TEFAL","","",111,"",1},
-                                    {"Ali","SEREKLİ","","",111,"",1},
-                                    {"Hasan","SERTTAŞ","","",111,"",1},
-                                    {"Niyazi","GÜLMEZ","233213","",111,"",1},
-                                    {"Osman","SIÇAR","445653","",111,"",1},
-                                  };
-        private List dataList;
-        
-        private final Class<?>[] COLUMN_TYPES = new Class<?>[] {String.class,String.class,String.class,String.class,
-                                                    Double.class,String.class,Double.class,JButton.class};
-        public void setData(Object[][] d){
-            this.data = d;
-        }
-        
-        public Object[][] getData(){
-            return data;
-        }
-        
-        public void setdataList(List liste){
-            this.dataList = liste;
-        }
-        
-        public List getDataList(){
-            return this.dataList;
-        }
-        
-        @Override
-        public int getRowCount() {
-            return data.length;
-        }
-
-        @Override
-        public int getColumnCount() {
-            return COLUMN_NAMES.length;
-        }
-
-        @Override
-        public Object getValueAt(int rowIndex, int columnIndex) {
-            if(columnIndex == 7){
-                JButton buton = new JButton(COLUMN_NAMES[columnIndex]);
-                buton.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        System.out.println("Efe geldi");
-                    }
-                });
-                buton.setSize(60, 60);
-                return buton;
-            }
-            
-            return data[rowIndex][columnIndex];
-        }
-
-        public Class getColumnClass(int c) {
-           return COLUMN_TYPES[c];
-        }
-
-        @Override 
-        public String getColumnName(int columnIndex) {
-            return COLUMN_NAMES[columnIndex];
-        }
-    }
+    
     
     private static class JTableButtonMouseListener extends MouseAdapter {
         private final JTable table;
@@ -144,27 +85,23 @@ public class ListOfCustomerPage extends javax.swing.JFrame {
     }
     
     private void findSpecialCustomer() {
-        Object[][] allOfData = tableModel.getData();
-        List<Object[]> newData = new ArrayList();
+        List<Customer> allOfData = tableModel.getData();
+        List<Customer> newData = new ArrayList();
         
         String musteriAdi = jTextField1.getText();
         String musteriSoyadi = jTextField2.getText();
         String musteriTel = jTextField3.getText();
         
         if (allOfData != null){
-            for(Object[] obj : allOfData){
-                if (obj[0].toString().equals(musteriAdi) || obj[1].toString().equals(musteriSoyadi) 
-                        || obj[2].toString().equals(musteriTel)){
+            for(Customer obj : allOfData){
+                if (obj.getFirstname().equals(musteriAdi) || obj.getLlstname().equals(musteriSoyadi) 
+                        || obj.getMobileNumber().equals(musteriTel)){
                     newData.add(obj);
                 }
             }
         }
-        Object[][] data = new Object[newData.size()][];
-        for(int i=0; i<newData.size(); i++){
-            data[i] = newData.get(i);
-        }
         
-        tableModel.setData(data);
+        tableModel.setData(newData);
         tableModel.fireTableDataChanged();
     }
     

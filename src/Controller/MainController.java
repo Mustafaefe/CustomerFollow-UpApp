@@ -111,7 +111,7 @@ public class MainController {
         return true;
     }
     
-    public Object[][] specifyToQuery(String name, String lname, String mobilenumber){        
+    public List<Customer> specifyToQuery(String name, String lname, String mobilenumber){        
         /*if (name.isEmpty() && lname.isEmpty() && mobilenumber.isEmpty()) 
             return null;*/
         
@@ -146,7 +146,7 @@ public class MainController {
         return findCustomer(name, lname, mobilenumber, kindOfQuery);
     }
     
-    public Object[][] findCustomer(String name, String lname, String mobilenumber, int kind){
+    public List<Customer> findCustomer(String name, String lname, String mobilenumber, int kind){
         if (emf == null) return null;
         
         EntityManager em = emf.createEntityManager();
@@ -185,7 +185,7 @@ public class MainController {
         return convertListToArray(customerList);
     }
     
-    public Object[][] listAllCustomer(){
+    public List<Customer> listAllCustomer(){
         if (emf == null) return null;
         
         EntityManager em = emf.createEntityManager();
@@ -197,25 +197,16 @@ public class MainController {
         return convertListToArray(liste);
     }
     
-    public Object[][] convertListToArray(List<?> list){
+    public List<Customer> convertListToArray(List<?> list){
         if (list == null) return null;
 
-        Object data[][] = new Object[list.size()][7];
+        List<Customer> data = new ArrayList<Customer>();
         Customer c;
         int index = 0;
         try{
             for(Object cus : list){
                 c = (Customer) cus;
-                data[index][0] = c.getFirstname();
-                data[index][1] = c.getLlstname();
-                data[index][2] = c.getMobileNumber();
-                data[index][3] = c.getAddress();
-                if(c.getAccount() != null){
-                    data[index][4] = c.getAccount().getAccTotalAmount();
-                    data[index][5] = 0;
-                    data[index][6] = c.getAccount().getAccLastAmount();
-                }
-                index++;
+                data.add(c);
             }
         }
         catch(NullPointerException e){
