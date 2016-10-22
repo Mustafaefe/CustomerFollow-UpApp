@@ -131,27 +131,6 @@ public class MainController {
         return convertListToArray(cusList);
     }
     
-    /*public Object[] findCustomerDetails(String name, String lname, String mobilenumber){
-        Customer cus = dbq.findCustomer(name, lname, mobilenumber);
-        Account acc = cus.getAccount();
-        Collection<Payment> payList = acc.getAccPayments();
-        Object[] customerInfoArray = new Object[9];
-        
-        //Customer Info
-        if (cus != null){
-            customerInfoArray[0] = cus.getFirstname();  customerInfoArray[1] = cus.getLlstname();  customerInfoArray[2] = cus.getMobileNumber();
-            customerInfoArray[3] = cus.getAddress();  customerInfoArray[4] = cus.getNote();
-        }
-        //Account Info
-        if (acc != null)    
-            customerInfoArray[5] = acc.getAccTotalAmount();  customerInfoArray[6] = acc.getAccLastAmount();  customerInfoArray[7] = acc.getAccLastPaymentDate();
-        //Payments
-        if (payList != null)    
-            customerInfoArray[8] = payList.toArray();
-        
-        return customerInfoArray;
-    }*/
-    
     public Object[][] listAllCustomer(){
         
         List<Customer> cusList = dbq.findAllCustomer();

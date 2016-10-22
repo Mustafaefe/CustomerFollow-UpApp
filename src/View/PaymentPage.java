@@ -148,15 +148,22 @@ public class PaymentPage {
             @Override
             public void keyTyped(KeyEvent e) {
                 char character = e.getKeyChar();
-                if(((JTextField)e.getComponent()).getText().length() == 0){
+                String jtf = ((JTextField)e.getComponent()).getText();
+                if(jtf.length() == 0){
                     if(character < '0' || character > '9'){
                         e.consume();
                     }
                 }
                 else {
                     if(character < '0' || character > '9'){
-                        if( character != '.' && character != ',')
+                        if( character != '.' && character != ','){
                             e.consume();
+                        }
+                        else{
+                            if(jtf.contains(",") || jtf.contains(".")){
+                                e.consume();
+                            }
+                        }
                     }
                 }
             }

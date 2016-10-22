@@ -104,11 +104,24 @@ public class NewCustomerPage extends javax.swing.JFrame {
     private void controlToNumericInput(){
         KeyListener keyList = new KeyAdapter() {
             public void keyTyped(KeyEvent e) {
-                char caracter = e.getKeyChar();
-                int size = ((JTextField) e.getComponent()).getText().length();
-                if ((((caracter < '0') || (caracter > '9'))
-                        && (caracter != '\b')) || (size >= 11) ) {
-                    e.consume();
+                char character = e.getKeyChar();
+                String jtf = ((JTextField) e.getComponent()).getText();
+                if(jtf.length() == 0){
+                    if(character < '0' || character > '9'){
+                        e.consume();
+                    }
+                }
+                else {
+                    if(character < '0' || character > '9'){
+                        if( character != '.' && character != ','){
+                            e.consume();
+                        }
+                        else{
+                            if(jtf.contains(",") || jtf.contains(".")){
+                                e.consume();
+                            }
+                        }
+                    }
                 }
             }
         };
