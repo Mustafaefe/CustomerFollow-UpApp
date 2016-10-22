@@ -1,12 +1,15 @@
 package Controller;
 
-import DatabaseConnection.EntityManagerFact;
-import DatabaseConnection.SessionFact;
+import DBHelper.DatabaseQuery;
+import DBHelper.EntityManagerFact;
+import DBHelper.SessionFact;
 import Model.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
@@ -17,25 +20,26 @@ import org.hibernate.cfg.Configuration;
 
 public class MainController {
     
+    DatabaseQuery dbq = null;
     SessionFact sessionFact = new SessionFact();
     EntityManagerFact EMFact = new EntityManagerFact();
-    EntityManagerFactory emf;
     
     public MainController() {
         //sf = sessionFact.getSessionFactory();
-        emf = EMFact.emf;
+        //emf = EMFact.emf;
+        dbq = new DatabaseQuery();
     }
     
     public boolean createNewCustomerAccount(String name, String lname, String mobilenumber, String address, String note,
-                                         Double amount, Date lastpayment){
-        Customer c = makeCustomerWithAccount(name, lname, mobilenumber, address, note);
-        Account a = makeAccount(amount, lastpayment);
+                                         Double amount, Date lastpayment, Date accCreateDate){
+        Customer c = makeCustomer(name, lname, mobilenumber, address, note);
+        Account a = makeAccount(amount, lastpayment, accCreateDate);
         c.setAccount(a);
         a.setAccCustomer(c);
-        return saveTransactionOne(c,a);
+        return saveCustomer(c,a);
     }
     
-    public Customer makeCustomerWithAccount(String name, String lname, String mobilenumber, String address, String note){
+    public Customer makeCustomer(String name, String lname, String mobilenumber, String address, String note){
         Customer customer = new Customer();
         customer.setAddress(address);
         customer.setFirstname(name);
@@ -45,41 +49,17 @@ public class MainController {
         return customer;
     }
 
-    public Account makeAccount(Double amount, Date lastpayment){
+    public Account makeAccount(Double amount, Date lastpayment, Date createDate){
         Account account = new Account();
         account.setAccTotalAmount(amount);
         account.setAccLastAmount(amount);
         account.setAccLastPaymentDate(lastpayment);
+        account.setAccCreateDate(createDate);
         return account;
     }
     
-    public Payment makePayment(Double amount, Date payDate, Account acc){
-        Payment payment = new Payment();
-        payment.setAmount(amount);
-        payment.setPayDate(payDate);
-        payment.setAccount(acc);
-        return payment;
-    }
-    
-    private boolean saveTransactionOne(Customer c, Account a) {
-        if (emf == null)
-            return false;
-
-        EntityManager em = emf.createEntityManager();
-        EntityTransaction et = em.getTransaction();
-        
-        et.begin();
-            em.persist(c);
-            em.persist(a);
-        et.commit();
-//        Session s = sf.openSession();
-//        s.beginTransaction();
-//        s.saveOrUpdate(c);
-//        s.saveOrUpdate(a);
-//        s.getTransaction().commit();
-//        s.close();
-        em.close();
-        return true;   
+    private boolean saveCustomer(Customer c, Account a) {
+        return dbq.saveTransaction(c, a);
     }
     
     public List<Integer> catchErrorFromGUI(String name, String lname, String mobilenumber, String address, String note,
@@ -111,11 +91,9 @@ public class MainController {
         return true;
     }
     
-    public List<Customer> specifyToQuery(String name, String lname, String mobilenumber){        
-        /*if (name.isEmpty() && lname.isEmpty() && mobilenumber.isEmpty()) 
-            return null;*/
-        
+    public int specifyToQuery(String name, String lname, String mobilenumber){        
         int kindOfQuery = 0;
+
         if (name.isEmpty()){
             if (lname.isEmpty()){
                 if (!mobilenumber.isEmpty()) 
@@ -142,76 +120,82 @@ public class MainController {
                     kindOfQuery = 4; // name and lname
             }
         }
-        
-        return findCustomer(name, lname, mobilenumber, kindOfQuery);
+        return kindOfQuery;
     }
     
-    public List<Customer> findCustomer(String name, String lname, String mobilenumber, int kind){
-        if (emf == null) return null;
+    public Object[][] findCustomer(String name, String lname, String mobilenumber){
         
-        EntityManager em = emf.createEntityManager();
-        EntityTransaction et = em.getTransaction();
-        Query query = null;
+        int kind = specifyToQuery(name, lname, mobilenumber);
+        List<Customer> cusList = dbq.findCustomer(name, lname, mobilenumber, kind);
         
-        switch(kind){
-            case 1: 
-                    query = em.createNamedQuery("query_kind_1").setParameter("_name", name).setParameter("l_name", lname)
-                                                                      .setParameter("m_number", mobilenumber);
-                    break;
-            case 2: 
-                    query = em.createNamedQuery("query_kind_2").setParameter("l_name", lname);
-                    break;                                                   
-            case 3: 
-                    query = em.createNamedQuery("query_kind_3").setParameter("m_number", mobilenumber);
-                    break;                                                   
-            case 4: 
-                    query = em.createNamedQuery("query_kind_4").setParameter("_name", name).setParameter("l_name", lname);
-                    break;                                                   
-            case 5: 
-                    query = em.createNamedQuery("query_kind_5").setParameter("_name", name).setParameter("m_number", mobilenumber);
-                    break;                                                   
-            case 6: 
-                    query = em.createNamedQuery("query_kind_6").setParameter("l_name", lname).setParameter("m_number", mobilenumber);
-                    break;                                                   
-            case 7: 
-                    query = em.createNamedQuery("query_kind_7").setParameter("_name", name);
-                    break;  
-            default:
-                    query = em.createNamedQuery("tumMusteriKayitlari");
-                    break;
+        return convertListToArray(cusList);
+    }
+    
+    /*public Object[] findCustomerDetails(String name, String lname, String mobilenumber){
+        Customer cus = dbq.findCustomer(name, lname, mobilenumber);
+        Account acc = cus.getAccount();
+        Collection<Payment> payList = acc.getAccPayments();
+        Object[] customerInfoArray = new Object[9];
+        
+        //Customer Info
+        if (cus != null){
+            customerInfoArray[0] = cus.getFirstname();  customerInfoArray[1] = cus.getLlstname();  customerInfoArray[2] = cus.getMobileNumber();
+            customerInfoArray[3] = cus.getAddress();  customerInfoArray[4] = cus.getNote();
         }
+        //Account Info
+        if (acc != null)    
+            customerInfoArray[5] = acc.getAccTotalAmount();  customerInfoArray[6] = acc.getAccLastAmount();  customerInfoArray[7] = acc.getAccLastPaymentDate();
+        //Payments
+        if (payList != null)    
+            customerInfoArray[8] = payList.toArray();
         
-        List<?> customerList = query.getResultList();
-        return convertListToArray(customerList);
+        return customerInfoArray;
+    }*/
+    
+    public Object[][] listAllCustomer(){
+        
+        List<Customer> cusList = dbq.findAllCustomer();
+        
+        return convertListToArray(cusList);
     }
     
-    public List<Customer> listAllCustomer(){
-        if (emf == null) return null;
-        
-        EntityManager em = emf.createEntityManager();
-        EntityTransaction et = em.getTransaction();
-
-        Query query = em.createNamedQuery("tumMusteriKayitlari");
-        List<?> liste = query.getResultList();
-
-        return convertListToArray(liste);
-    }
-    
-    public List<Customer> convertListToArray(List<?> list){
+    public Object[][] convertListToArray(List<?> list){
         if (list == null) return null;
-
-        List<Customer> data = new ArrayList<Customer>();
+        
+        Object[][] data = new Object[list.size()][10];
+        
         Customer c;
+        Account a;
+        Collection<Payment> payList;
         int index = 0;
+
         try{
             for(Object cus : list){
                 c = (Customer) cus;
-                data.add(c);
+                a = c.getAccount();
+                data[index][0] = c.getFirstname();
+                data[index][1] = c.getFirstname();
+                data[index][2] = c.getLlstname();
+                data[index][3] = c.getMobileNumber();
+                data[index][4] = c.getAddress();
+                data[index][5] = c.getNote();
+                if (a != null){
+                    data[index][6] = c.getAccount().getAccTotalAmount();
+                    data[index][7] = c.getAccount().getAccLastAmount();
+                    data[index][8] = c.getAccount().getAccLastPaymentDate();
+                    data[index][9] = c.getAccount().getAccCreateDate();
+                    payList = a.getAccPayments();
+                    if (payList != null){
+                        data[index][10] = payList.toArray();
+                    }
+                }
+                index++;
             }
         }
-        catch(NullPointerException e){
+        catch(Exception e){
             System.out.println("Customer yada Account boş geldi");
         }
+        
         return data;
     }
 }

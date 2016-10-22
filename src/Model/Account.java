@@ -15,6 +15,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
@@ -30,6 +31,7 @@ public class Account {
     private int accId;
     private double accTotalAmount;
     private double accLastAmount;
+    private Date accCreateDate;
     private Date accLastPaymentDate;
     @OneToOne
     @JoinColumn(name="MusteriId")
@@ -84,5 +86,13 @@ public class Account {
 
     public void setAccLastPaymentDate(Date accLastPaymentDate) {
         this.accLastPaymentDate = accLastPaymentDate;
+    }
+
+    public Date getAccCreateDate() {
+        return accCreateDate;
+    }
+
+    public void setAccCreateDate(Date accCreateDate) {
+        this.accCreateDate = accCreateDate;
     }
 }

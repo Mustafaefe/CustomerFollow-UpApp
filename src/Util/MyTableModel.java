@@ -1,6 +1,7 @@
 package Util;
 
 import Model.Customer;
+import View.DetailsCustomerPage;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -13,23 +14,26 @@ import javax.swing.table.AbstractTableModel;
  * @author Mustafa
  */
 public class MyTableModel extends AbstractTableModel{
-    private String[] COLUMN_NAMES = {"Ad", "Soyad", "Telefon", "Adres","Toplam Borç","Ödeme Sayısı","Kalan Borç","Detay"};
-    private List<Customer> data = new ArrayList<Customer>();
+    private String[] COLUMN_NAMES = {"Sıra","Ad", "Soyad", "Telefon", "Adres","Toplam Borç","Kalan Borç","Son Ödeme Tarihi","Detay"};
+    private Object[][] data = { {"1","Mustafa","EFE","1122345678","Burdur",150,"0",150},
+                                {"2","İbrahim","EFE","1935675678","Kozağaç",120,"0",250},
+                                };
 
-    private final Class<?>[] COLUMN_TYPES = new Class<?>[] {String.class,String.class,String.class,String.class,
-                                                Double.class,String.class,Double.class,JButton.class};
+    private final Class<?>[] COLUMN_TYPES = new Class<?>[] {String.class,String.class,String.class,String.class,String.class,
+                                                Double.class,Double.class,String.class,JButton.class};
 
-    public List<Customer> getData() {
+    
+    public Object[][] getData() {
         return data;
     }
 
-    public void setData(List<Customer> data) {
+    public void setData(Object[][] data) {
         this.data = data;
     }
         
     @Override
     public int getRowCount() {
-        return data.size();
+        return data.length;
     }
 
     @Override
@@ -39,40 +43,31 @@ public class MyTableModel extends AbstractTableModel{
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        Customer c;
-        if (columnIndex != 7){
-            c = data.get(rowIndex);
-            switch(columnIndex){
-                case 0:
-                    return c.getFirstname();
-                case 1:
-                    return c.getLlstname();
-                case 2:
-                    return c.getMobileNumber();
-                case 3:
-                    return c.getAddress();
-                case 4:
-                    if (c.getAccount() == null) return null;
-                    return c.getAccount().getAccTotalAmount();
-                case 5:
-                    return 0;
-                case 6:
-                    if (c.getAccount() == null) return null;
-                    return c.getAccount().getAccLastAmount();
-                default:
-                    return "";
-            }
-        }
-        else{
+        if(columnIndex == 8){
             JButton buton = new JButton(COLUMN_NAMES[columnIndex]);
             buton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    System.out.println(data.get(rowIndex).getFirstname()+", "+data.get(rowIndex).getLlstname());
+                    DetailsCustomerPage dcp = new DetailsCustomerPage(data[rowIndex]);
+                    dcp.setVisible(true);
                 }
             });
             return buton;
         }
+        if(columnIndex == 0){
+            return (rowIndex+1)+"";
+        }
+        if(columnIndex == 5){
+            return data[rowIndex][columnIndex+1];
+        }
+        if(columnIndex == 6){
+            return data[rowIndex][columnIndex+1];
+        }
+        if(columnIndex == 7){
+            return data[rowIndex][columnIndex+1];
+        }
+        
+        return data[rowIndex][columnIndex];
     }
 
     public Class getColumnClass(int c) {

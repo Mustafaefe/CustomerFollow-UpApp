@@ -24,6 +24,8 @@ public class Payment {
     @Column(name = "OdemeId")
     private int id;
     private double amount;
+    private double arrears; //bakiye
+    private String modeOfPayment;
     private Date payDate;
     @ManyToOne
     private Account account;
@@ -58,5 +60,21 @@ public class Payment {
 
     public void setAccount(Account account) {
         this.account = account;
+    }
+
+    public double getArrears() {
+        return arrears;
+    }
+
+    public void setArrears(double arrears) {
+        this.arrears = arrears;
+    }
+
+    public String getModeOfPayment() {
+        return modeOfPayment;
+    }
+
+    public void setModeOfPayment(String modeOfPayment) {
+        this.modeOfPayment = modeOfPayment;
     }
 }

@@ -21,4 +21,5 @@ public class MyTableButtonRenderer implements TableCellRenderer{
         JButton button = (JButton)value;
         return button;
     }
+    
 }

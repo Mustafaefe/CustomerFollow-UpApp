@@ -1,4 +1,4 @@
-package DatabaseConnection;
+package DBHelper;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -13,6 +13,7 @@ public class EntityManagerFact {
             emf = Persistence.createEntityManagerFactory("PUnit_AyarDosyasi");
         }
         catch(PersistenceException e){
+            e.printStackTrace();
             JOptionPane.showMessageDialog(null, "BAĞLANTI HATASI");
         }
     }

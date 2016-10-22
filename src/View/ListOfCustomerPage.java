@@ -1,9 +1,9 @@
 package View;
 
 import Controller.MainController;
-import Model.Customer;
 import Util.MyTableButtonRenderer;
 import Util.MyTableModel;
+import java.awt.Container;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -25,6 +25,7 @@ public class ListOfCustomerPage extends javax.swing.JFrame {
 
     MainController mCont;
     MyTableModel tableModel;
+    final Container con = this;
     
     private void init(){
         this.setBounds(450, 200, 1000, 750);
@@ -32,17 +33,21 @@ public class ListOfCustomerPage extends javax.swing.JFrame {
         changeWindowIcon();
         
         jTable1.setModel(tableModel);
+        jTable1.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 13));
+        
         TableCellRenderer buttonRenderer = new MyTableButtonRenderer();
         jTable1.getColumn("Detay").setCellRenderer(buttonRenderer);
-        
+
         //topalm borç, ödeme sayısı ve kalan borç sutunlarındaki verileri ortalıyor.
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment( JLabel.CENTER );
         jTable1.getColumn("Kalan Borç").setCellRenderer(centerRenderer);
-        jTable1.getColumn("Kalan Borç").setHeaderRenderer(centerRenderer);
-        jTable1.getColumn("Toplam Borç").setHeaderRenderer(centerRenderer);
-        jTable1.getColumn("Ödeme Sayısı").setCellRenderer(centerRenderer);
-        jTable1.getColumn("Ödeme Sayısı").setHeaderRenderer(centerRenderer);
+        //jTable1.getColumn("Kalan Borç").setHeaderRenderer(centerRenderer);
+        jTable1.getColumn("Toplam Borç").setCellRenderer(centerRenderer);
+        //jTable1.getColumn("Toplam Borç").setHeaderRenderer(centerRenderer);
+        jTable1.getColumn("Son Ödeme Tarihi").setCellRenderer(centerRenderer);
+        //jTable1.getColumn("Son Ödeme Tarihi").setHeaderRenderer(centerRenderer);
+        jTable1.getColumn("Sıra").setPreferredWidth(9);
         
         jTable1.addMouseListener(new JTableButtonMouseListener(jTable1));
         jTable1.setRowHeight(25);
@@ -62,9 +67,7 @@ public class ListOfCustomerPage extends javax.swing.JFrame {
         tableModel.fireTableDataChanged();
     }
     
-    
-    
-    private static class JTableButtonMouseListener extends MouseAdapter {
+    private class JTableButtonMouseListener extends MouseAdapter {
         private final JTable table;
 
         public JTableButtonMouseListener(JTable table) {
@@ -79,30 +82,26 @@ public class ListOfCustomerPage extends javax.swing.JFrame {
                 Object value = table.getValueAt(row, column);
                 if (value instanceof JButton) {
                     ((JButton)value).doClick();
+                    con.setVisible(false);
                 }
             }
         }
     }
     
     private void findSpecialCustomer() {
-        List<Customer> allOfData = tableModel.getData();
-        List<Customer> newData = new ArrayList();
-        
-        String musteriAdi = jTextField1.getText();
-        String musteriSoyadi = jTextField2.getText();
+        String musteriAdi = jTextField1.getText().toUpperCase();
+        String musteriSoyadi = jTextField2.getText().toUpperCase();
         String musteriTel = jTextField3.getText();
         
-        if (allOfData != null){
-            for(Customer obj : allOfData){
-                if (obj.getFirstname().equals(musteriAdi) || obj.getLlstname().equals(musteriSoyadi) 
-                        || obj.getMobileNumber().equals(musteriTel)){
-                    newData.add(obj);
-                }
-            }
+        Object[][] newData = mCont.findCustomer(musteriAdi, musteriSoyadi, musteriTel);
+        if(newData != null){
+            tableModel.setData(newData);
+            tableModel.fireTableDataChanged();
         }
-        
-        tableModel.setData(newData);
-        tableModel.fireTableDataChanged();
+        else{
+            tableModel.setData(new Object[0][9]);
+            tableModel.fireTableDataChanged();
+        }
     }
     
     private void goToMainPage() {
@@ -112,16 +111,16 @@ public class ListOfCustomerPage extends javax.swing.JFrame {
     }
     
     private void getInfoForFind() {
-        String musteriAdi = jTextField1.getText();
+        /*String musteriAdi = jTextField1.getText();
         String musteriSoyadi = jTextField2.getText();
         String musteriTel = jTextField3.getText();
         
-        goToController(musteriAdi, musteriSoyadi, musteriTel);
+        findSpecialCustomer();*/
     }
     
     private void goToController(String musteriAdi, String musteriSoyadi, String musteriTel) {
-        tableModel.setData(mCont.specifyToQuery(musteriAdi, musteriSoyadi, musteriTel));
-        tableModel.fireTableDataChanged();
+        //tableModel.setData(mCont.specifyToQuery(musteriAdi, musteriSoyadi, musteriTel));
+        //tableModel.fireTableDataChanged();
     }
     
     @SuppressWarnings("unchecked")
@@ -285,8 +284,8 @@ public class ListOfCustomerPage extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        getInfoForFind(); 
-        //findSpecialCustomer();
+        //getInfoForFind(); 
+        findSpecialCustomer();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed

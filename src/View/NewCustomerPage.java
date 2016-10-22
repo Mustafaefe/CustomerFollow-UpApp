@@ -10,9 +10,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Properties;
 import java.util.TimerTask;
 import javax.persistence.EntityManagerFactory;
@@ -26,8 +26,10 @@ import org.jdatepicker.impl.UtilDateModel;
 
 public class NewCustomerPage extends javax.swing.JFrame {
 
-    JDatePickerImpl datePicker;
-    UtilDateModel model;
+    JDatePickerImpl lastPaymentDate;
+    JDatePickerImpl accCreateDate;
+    UtilDateModel model_lpd;
+    UtilDateModel model_acd;
     MainController mCont;
     
     public void init(){
@@ -35,7 +37,8 @@ public class NewCustomerPage extends javax.swing.JFrame {
         this.setResizable(false);
         setDatePicker();
         changeWindowIcon();
-        this.add(datePicker);
+        this.add(lastPaymentDate);
+        this.add(accCreateDate);
         controlToNumericInput();
     }
     
@@ -46,18 +49,27 @@ public class NewCustomerPage extends javax.swing.JFrame {
     }
     
     public void setDatePicker(){
-        model = new UtilDateModel();
-        model.setValue(new Date());
+        model_lpd = new UtilDateModel();
+        model_lpd.setValue(new Date());
         Properties p = new Properties();
         p.put("text.today", "Today");
         p.put("text.month", "Month");
         p.put("text.year", "Year");
-        JDatePanelImpl datePanel = new JDatePanelImpl(model, p);
-        datePicker = new JDatePickerImpl(datePanel, new DateLabelFormatter());
-        datePicker.setBounds(615, 178, 170, 30);
-        datePicker.setEnabled(true);
-        datePicker.setTextEditable(true);
-        datePicker.setShowYearButtons(true);
+        JDatePanelImpl datePanel = new JDatePanelImpl(model_lpd, p);
+        lastPaymentDate = new JDatePickerImpl(datePanel, new DateLabelFormatter());
+        lastPaymentDate.setBounds(615, 178, 170, 30);
+        lastPaymentDate.setEnabled(true);
+        lastPaymentDate.setTextEditable(true);
+        lastPaymentDate.setShowYearButtons(true);
+        //****-*--*--*-/-*/-*/-*/-*/-*/-*/-*/-*/-*/-*/-*/-/-*/
+        model_acd = new UtilDateModel();
+        model_acd.setValue(new Date());
+        JDatePanelImpl datePanel2 = new JDatePanelImpl(model_acd, p);
+        accCreateDate = new JDatePickerImpl(datePanel2, new DateLabelFormatter());
+        accCreateDate.setBounds(615, 218, 170, 30);
+        accCreateDate.setEnabled(true);
+        accCreateDate.setTextEditable(true);
+        accCreateDate.setShowYearButtons(true);
     }
      
     public void changeWindowIcon(){
@@ -74,17 +86,19 @@ public class NewCustomerPage extends javax.swing.JFrame {
     //Müşterinin arayüze girdiği bilgiler alınıyor.
     private void getInfoFromGUI() {
         //Müşteri bilgileri
-        String musteriAdi = jTextField1.getText();
-        String musteriSoyadi = jTextField2.getText();
+        String musteriAdi = jTextField1.getText().toUpperCase();
+        String musteriSoyadi = jTextField2.getText().toUpperCase();
         String musteriCepTel = jTextField3.getText();
         String musteriAdres = jTextField4.getText();
         String musteriNot = jTextPane1.getText();
         
         //Hesap Bilgileri
         String hesapTutari = jTextField5.getText();
-        Date sonOdemeTarihi = model.getValue();
-        
-        goToController(musteriAdi, musteriSoyadi, musteriCepTel, musteriAdres, musteriNot, hesapTutari, sonOdemeTarihi);
+        Date sonOdemeTarihi = model_lpd.getValue();
+        Date hesapOluşturmaTarihi = model_acd.getValue();
+
+        goToController(musteriAdi, musteriSoyadi, musteriCepTel, musteriAdres, musteriNot, hesapTutari, 
+                        sonOdemeTarihi, hesapOluşturmaTarihi);
     }
     
     private void controlToNumericInput(){
@@ -104,12 +118,13 @@ public class NewCustomerPage extends javax.swing.JFrame {
     }
     
     private void goToController(String name, String lname, String mobilenumber, String address, String note,
-                                         String amount, Date lastpayment){
+                                         String amount, Date lastpayment, Date createDate){
         List<Integer> errors = mCont.catchErrorFromGUI(name, lname, mobilenumber, address, note, amount, lastpayment);
         ImageIcon icon = new ImageIcon("C:\\Users\\Mustafa\\Documents\\NetBeansProjects\\PostgreSqlDBProject\\src\\icons\\success-arrow.png");
         boolean result = false;
         if (errors.isEmpty()){
-            result = mCont.createNewCustomerAccount(name, lname, mobilenumber, address, note, Double.parseDouble(amount), lastpayment);
+            result = mCont.createNewCustomerAccount(name, lname, mobilenumber, address, note, Double.parseDouble(amount), 
+                                            lastpayment, createDate);
             alanlariBosalt();
         }else{
             showErrors(errors);
@@ -121,8 +136,8 @@ public class NewCustomerPage extends javax.swing.JFrame {
     
     private void alanlariBosalt() {
         jTextField1.setText("");    jTextPane1.setText("");
-        jTextField2.setText("");    model.setValue(new Date());
-        jTextField3.setText("");
+        jTextField2.setText("");    model_lpd.setValue(new Date());
+        jTextField3.setText("");    model_acd.setValue(new Date());
         jTextField4.setText("");
         jTextField5.setText("");
     }
@@ -166,6 +181,7 @@ public class NewCustomerPage extends javax.swing.JFrame {
         jTextField5 = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
+        jLabel11 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -216,6 +232,8 @@ public class NewCustomerPage extends javax.swing.JFrame {
             }
         });
 
+        jLabel11.setText("Oluşma Tarihi");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -255,7 +273,8 @@ public class NewCustomerPage extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel9, javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel10, javax.swing.GroupLayout.Alignment.TRAILING))
+                                    .addComponent(jLabel10, javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jLabel11, javax.swing.GroupLayout.Alignment.TRAILING))
                                 .addGap(44, 44, 44)
                                 .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addContainerGap())
@@ -302,7 +321,8 @@ public class NewCustomerPage extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6)
-                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel11))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel7)
@@ -379,6 +399,7 @@ public class NewCustomerPage extends javax.swing.JFrame {
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
