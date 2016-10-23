@@ -141,7 +141,7 @@ public class MainController {
     public Object[][] convertListToArray(List<?> list){
         if (list == null) return null;
         
-        Object[][] data = new Object[list.size()][10];
+        Object[][] data = new Object[list.size()][11];
         
         Customer c;
         Account a;

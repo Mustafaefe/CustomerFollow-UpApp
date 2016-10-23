@@ -4,6 +4,7 @@ import Model.Customer;
 import View.DetailsCustomerPage;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JButton;
@@ -64,7 +65,8 @@ public class MyTableModel extends AbstractTableModel{
             return data[rowIndex][columnIndex+1];
         }
         if(columnIndex == 7){
-            return data[rowIndex][columnIndex+1];
+            SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+            return sdf.format(data[rowIndex][columnIndex+1]);
         }
         
         return data[rowIndex][columnIndex];

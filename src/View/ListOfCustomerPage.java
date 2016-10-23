@@ -99,7 +99,7 @@ public class ListOfCustomerPage extends javax.swing.JFrame {
             tableModel.fireTableDataChanged();
         }
         else{
-            tableModel.setData(new Object[0][9]);
+            tableModel.setData(new Object[0][10]);
             tableModel.fireTableDataChanged();
         }
     }
@@ -108,19 +108,6 @@ public class ListOfCustomerPage extends javax.swing.JFrame {
         MainPage mp = new MainPage();
         mp.setVisible(true);
         this.setVisible(false);
-    }
-    
-    private void getInfoForFind() {
-        /*String musteriAdi = jTextField1.getText();
-        String musteriSoyadi = jTextField2.getText();
-        String musteriTel = jTextField3.getText();
-        
-        findSpecialCustomer();*/
-    }
-    
-    private void goToController(String musteriAdi, String musteriSoyadi, String musteriTel) {
-        //tableModel.setData(mCont.specifyToQuery(musteriAdi, musteriSoyadi, musteriTel));
-        //tableModel.fireTableDataChanged();
     }
     
     @SuppressWarnings("unchecked")

@@ -27,7 +27,7 @@ public class PaymentController {
         payment.setAmount(amount);
         payment.setPayDate(payDate);
         payment.setModeOfPayment(paymentMode);
-        //payment.setAccount(currentAccount);
+        payment.setAccount(currentAccount);
         
         Double kalan_borç = currentAccount.getAccLastAmount() - amount;
         payment.setArrears(kalan_borç);
